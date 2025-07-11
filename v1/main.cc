@@ -1,6 +1,5 @@
 #include <iostream>
 #include <workflow/WFTaskFactory.h>
-#include <workflow/WFHttpServer.h>
 #include <workflow/HttpUtil.h>
 #include <workflow/WFFacilities.h>
 #include <workflow/HttpMessage.h>
@@ -10,6 +9,7 @@
 #include <fcntl.h>
 #include <string>
 #include <fstream>
+#include <wfrest/HttpServer.h>
 
 #include "CryptoUtil.h"
 
@@ -18,67 +18,52 @@ using std::endl;
 using std::cout;
 using std::string;
 using std::cerr;
-
+using namespace wfrest;
 #define PORT 9527
 
-
-class Router{
-    public:
-    Router(){
-
+class MyRouter {
+public:
+    MyRouter(HttpServer &server) : m_server(server) {
+        m_server.GET("/hello", [](const HttpReq *req, HttpResp *resp) {
+            resp->String("hello world!");
+        });
     }
-    void route(WFHttpTask *task) {
-        HttpRequest *req = task->get_req();
-        HttpResponse *resp = task->get_resp();
 
-        string method = req->get_method();
-        string path = req->get_request_uri();
-        
-        if(path == "/hello") {
-            resp->append_output_body("Hello from root path!");
-        }
-
-
-    };
-
+private:
+    HttpServer& m_server;
 };
 
-class Server{
-    public:
-    Server(int port, Router & router):m_router(router),m_port(port), m_server(std::bind(&Router::route, &router, std::placeholders::_1)){
-        
-    }
+class Server {
+public:
+    Server(int port) : m_port(port), m_server(), m_router(m_server) {}
+
     int start() {
         int start_ret = m_server.start(m_port);
         return start_ret;
     }
+
     int stop() {
         m_server.stop();
         return 0;
     }
-    private:
-    // 路由
-    Router &m_router;
-    // 端口
+
+private:
     int m_port;
-    // 服务器
-    WFHttpServer m_server;
+    HttpServer m_server;
+    MyRouter m_router;
 };
 
-
-// static WFFacilities::WaitGroup global_wait_group{1};
-
-int main(){
-    Router router;
-    Server server{PORT, router};
-    if(!server.start()) {
-        //global_wait_group.wait();
+int main() {
+    Server server(PORT);
+    
+    if (!server.start()) {
         getchar();
+        cout << "exit!" <<endl;
         server.stop();
     } else {
         cerr << "Server start failed!" << endl;
         exit(1);
     }
+    
     return 0;
 }
-
