@@ -10,6 +10,8 @@
 #include <string>
 #include <fstream>
 #include <wfrest/HttpServer.h>
+#include <vector>
+
 
 #include "CryptoUtil.h"
 #include "nlohmann/json.hpp"
@@ -37,6 +39,7 @@ struct Context {
     string username;
     string password;
     HttpResp* resp;
+    int id;
 };
 
 static WFFacilities::WaitGroup global_wait_group{1};
@@ -55,8 +58,13 @@ public:
         });
 
         // 获取用户信息
-        m_server.GET("/user/info",[this](const HttpReq* req, HttpResponse *resp,SeriesWork *series){
+        m_server.GET("/user/info",[this](const HttpReq* req, HttpResp *resp,SeriesWork *series){
             this->getinfo_callback(req,resp,series);
+        });
+
+        // 文件列表查询
+        m_server.POST("/file/query",[this](const HttpReq* req,HttpResp *resp,SeriesWork* series) {
+            this->search_file_callback(req, resp, series);
         });
 
     }
@@ -147,8 +155,8 @@ void login_callback(const HttpReq* req, HttpResp *resp,SeriesWork *series){
                 delete ctx;
                 return;
             }
-            string db_register_time = record[4].as_datetime();
-            cout << db_register_time << endl;
+            
+            
             string db_hashcode = record[2].as_string(); 
             string db_salt = record[3].as_string();
             cout << "db_salt: " <<db_salt<<endl;
@@ -162,7 +170,6 @@ void login_callback(const HttpReq* req, HttpResp *resp,SeriesWork *series){
                 json ret = {
                     "data", {
                         {"username",ctx->username},
-                        {"SignupAt",string(db_register_time)},
                         {"Location","/static/view/home.html"},
                         {"token",token}
                     }
@@ -180,7 +187,122 @@ void login_callback(const HttpReq* req, HttpResp *resp,SeriesWork *series){
     );
     sql_task->get_req()->set_query(sql);
     series->push_back(sql_task);
-    
+
+}
+
+// 获取用户信息
+void getinfo_callback(const HttpReq *req, HttpResp *resp, SeriesWork *series) {
+    string  username = req->query("username");
+    const string & token = req->query("token");
+    if(!CryptoUtil::verify_token(token, username)){
+        resp->set_status_code("401"); 
+        resp->append_output_body_nocopy("<html>401 Unauthorized</html>");
+        return ;
+    } 
+    string sql = "SELECT * FROM tbl_user WHERE username = '" + username +"'";
+    cout << "[SQL]" << sql << endl;
+    WFMySQLTask *sql_task = WFTaskFactory::create_mysql_task(MYSQL_URL,MAX_RETRY,[resp](WFMySQLTask *sql_task){
+        if(sql_task->get_state() != WFT_STATE_SUCCESS ) {
+            resp->set_status(500);
+            resp->String("Database error!");
+            return;
+        }
+        MySQLResultCursor cursor {sql_task->get_resp()};
+        std::vector<MySQLCell> record;
+        bool success = cursor.fetch_row(record);
+        if(!success) {
+            resp->set_status(401);
+            resp->String("Invalid username");
+            return;
+        }
+        resp->set_status(200);
+        string db_register_time = record[4].as_datetime();
+        json user_info = {
+            {"data", {
+                {"username", record[1].as_string()},
+                {"SignupAt", db_register_time}
+            }}
+        };
+        resp->String(user_info.dump(2));
+    });
+    sql_task->get_req()->set_query(sql);
+    series->push_back(sql_task);
+
+}
+
+
+
+// 获取文件列表
+void search_file_callback(const HttpReq* req, HttpResp *resp,SeriesWork *series) {
+    string  username = req->query("username");
+    const string & token = req->query("token");
+    if(!CryptoUtil::verify_token(token, username)){
+        resp->set_status_code("401"); 
+        resp->append_output_body_nocopy("<html>401 Unauthorized</html>");
+        return ;
+    }
+    cout << "token is currect" << endl;
+
+    // 先获取id，通过id查询uid
+    string sql = "SELECT * FROM tbl_user WHERE username = '" + username +"'";
+    WFMySQLTask *sql_task = WFTaskFactory::create_mysql_task(MYSQL_URL,MAX_RETRY,[resp,series](WFMySQLTask *sql_task){
+        if(sql_task->get_state() != WFT_STATE_SUCCESS ) {
+            resp->set_status(500);
+            resp->String("Database error!");
+            return;
+        }
+        MySQLResultCursor cursor {sql_task->get_resp()};
+        std::vector<MySQLCell> record;
+        bool success = cursor.fetch_row(record);
+        if(!success) {
+            resp->set_status(401);
+            resp->String("Invalid username");
+            return;
+        }
+        int uid = record[0].as_int();
+
+
+           // 查询file表
+        string sql2 = "SELECT * FROM tbl_file WHERE uid = " + std::to_string(uid);
+        WFMySQLTask *sql_task2 = WFTaskFactory::create_mysql_task(MYSQL_URL,MAX_RETRY,[resp](WFMySQLTask *sql_task){
+        if(sql_task->get_state() != WFT_STATE_SUCCESS ) {
+            resp->set_status(500);
+            resp->String("Database error!");
+            return;
+        }
+        MySQLResultCursor cursor {sql_task->get_resp()};
+        std::vector<MySQLCell> record;
+        json result = json::array();
+        while (true) {
+            std::vector<MySQLCell> record;
+            if (!cursor.fetch_row(record)) break;
+
+            if (record.size() >= 8 && record[7].as_int() == 0) {
+                json file_info = {
+                    {"Filename",record[2].as_string()},
+                    {"FileHash",record[3].as_string()},
+                    {"FileSize",record[4].as_int()},
+                    {"UploadAt",record[5].as_datetime()},
+                    {"LastUpdated",record[6].as_datetime()}
+                };
+                result.push_back(file_info);
+            }
+        }
+        if(result.empty()) {
+            resp->set_status(404);
+            resp->String("404 NOT FOUND");
+        } else {
+            resp->set_status(200);
+            resp->append_output_body(result.dump(2));
+        }
+    });
+    sql_task2->get_req()->set_query(sql2);
+    series->push_back(sql_task2);
+
+    });
+    sql_task->get_req()->set_query(sql);
+    series->push_back(sql_task);
+
 }
     HttpServer& m_server;
 };
