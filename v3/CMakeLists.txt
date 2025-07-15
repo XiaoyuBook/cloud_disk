@@ -16,8 +16,24 @@ add_executable(server
     CloudiskServer.cpp
     main.cpp
     CryptoUtil.cc
-    OSSManager.cc      
+    OSSManager.cc
+    RabbitMQ.cc      # 添加RabbitMQ相关源文件
 )
+
+# 查找SimpleAmqpClient库
+find_library(SIMPLE_AMQP_CLIENT_LIB SimpleAmqpClient)
+if(NOT SIMPLE_AMQP_CLIENT_LIB)
+    message(FATAL_ERROR "SimpleAmqpClient library not found")
+endif()
+
+# 查找Boost库
+find_package(Boost REQUIRED COMPONENTS system)
+if(NOT Boost_FOUND)
+    message(FATAL_ERROR "Boost library not found")
+endif()
+
+# 可能需要添加SimpleAmqpClient的头文件搜索路径
+# include_directories(/path/to/simpleamqpclient/include)
 
 # 链接库
 target_link_libraries(server PRIVATE 
@@ -26,7 +42,9 @@ target_link_libraries(server PRIVATE
     jwt
     workflow
     wfrest
-    alibabacloud-oss-cpp-sdk  
-    curl 
+    alibabacloud-oss-cpp-sdk
+    curl
     pthread
+    ${SIMPLE_AMQP_CLIENT_LIB}  # 添加SimpleAmqpClient库
+    ${Boost_LIBRARIES}         # 添加Boost库
 )

@@ -1,5 +1,5 @@
 #include "RabbitMQ.h"
-
+#include "OSSManager.h"
 using json = nlohmann::json;
 using std::string;
 
@@ -12,7 +12,8 @@ RabbitMQ::RabbitMQ(const std::string& config_path) {
 void RabbitMQ::get_RabbitMQConfig(const std::string& config_path) {
         std::ifstream ifs(config_path);  
         if (!ifs.is_open()) {
-            throw std::runtime_error("无法打开配置文件: " + config_path);
+            std::cout << "无法打开配置文件" << std::endl;
+            return;
         }
 
         json config = json::parse(ifs); 
@@ -42,7 +43,15 @@ void RabbitMQ::consumer() {
     while(1) {
         AmqpClient::Envelope::ptr_t envelope = channel->BasicConsumeMessage();
         if(envelope && envelope->Message()) {
-            std::cout << envelope->Message()->Body() << std::endl;
+            string save_path = envelope->Message()->Body();
+            OSSManager oss("OSS_config.json");
+            string bucketName = "oss-learing";
+            string objectName = save_path;
+            string filePath = "./"+save_path;
+            bool ok = oss.upload_file(bucketName, objectName, filePath);
+            if(!ok) {
+                std::cout << "failed to upload oss" << std::endl;
+            }
         }
     }
 }

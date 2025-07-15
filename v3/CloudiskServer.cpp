@@ -1,13 +1,13 @@
 // CloudiskServer.cpp
 #include "CloudiskServer.h"
 #include "handler.h"
+#include "RabbitMQ.h"
 
 using namespace wfrest;
 using std::string;
 
 
-void CloudiskServer::register_modules()
-{
+void CloudiskServer::register_modules() {
     // 1.设置静态资源的路由
     register_static_resources_module();
 
@@ -380,29 +380,9 @@ void CloudiskServer::upload_callback(const HttpReq *req, HttpResp* resp, SeriesW
                 }
                 resp->Save(save_path, content);
 
-                // v2的上传
-                std::ifstream ifs("OSSConfig.json");
-                json config = json::parse(ifs);
-
-                string endpoint = config["endpoint"];
-                string accessKeyId = config["accessKeyId"];
-                string accessKeySecret = config["accessKeySecret"];
-                ClientConfiguration conf;
-
-                OSSManager  oss(endpoint, accessKeyId, accessKeySecret, conf);
-                string bucketName = "oss-learning";
-                string objectName = "disk/"+username+"/"+filename;
-                
-                sleep(1);
-
-                // 第一个objectName是oss存放的位置，第二个objectName是本地存放的位置
-                bool ok = oss.upload_file(bucketName, objectName, objectName);
-                if(!ok) {
-                    resp->set_status(500);
-                    resp->String("OSS Upload failed !" );
-                }
-                // 以上是v2
-
+                // v3的上传
+                RabbitMQ r("RabbitMQ_config.json");
+                r.producer(save_path.c_str());
 
                 std::string sql_insert = "INSERT INTO tbl_file(uid, filename, hashcode, size) VALUES (" +
                                          std::to_string(uid) + ", '" +

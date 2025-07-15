@@ -1,3 +1,4 @@
+#pragma once
 #ifndef RABBITMQ_H
 #define RABBITMQ_H
 
