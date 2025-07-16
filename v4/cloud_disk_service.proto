@@ -1,0 +1,17 @@
+// user_service.proto
+syntax = "proto3";
+
+message signup_request {
+    string username = 1;
+    string password = 2;
+};
+
+message signup_response {
+    int32 state_code = 1;
+    string message = 2;
+};
+
+
+service cloud_disk_service  {
+    rpc signup(signup_request) returns (signup_response);
+}
