@@ -9,21 +9,17 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # 设置输出路径
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ../)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
 
-# ProtoBuf / SRPC 编译生成的文件
-set(PROTO_SRCS
-    cloud_disk_service.pb.cc
-    cloud_disk_service.pb.h
-    cloud_disk_service.srpc.h
-)
+# 设置源文件目录
+set(SRC_DIR ${PROJECT_SOURCE_DIR}/src)
+set(INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include)
 
-# 公共源文件
-set(COMMON_SRCS
-    CryptoUtil.cc
-    OSSManager.cc
-    RabbitMQ.cc
-)
+# 查找 Protocol Buffers
+find_package(Protobuf REQUIRED)
+if(NOT Protobuf_FOUND)
+    message(FATAL_ERROR "Protobuf library not found")
+endif()
 
 # 查找 SimpleAmqpClient 库
 find_library(SIMPLE_AMQP_CLIENT_LIB SimpleAmqpClient)
@@ -37,17 +33,36 @@ if(NOT Boost_FOUND)
     message(FATAL_ERROR "Boost library not found")
 endif()
 
+# 查找其他依赖库
+find_package(OpenSSL REQUIRED)
+find_package(workflow REQUIRED)
+find_package(wfrest REQUIRED)
+
+# 设置包含目录
+include_directories(
+    ${INCLUDE_DIR}
+    ${Protobuf_INCLUDE_DIRS}
+    ${Boost_INCLUDE_DIRS}
+    ${OPENSSL_INCLUDE_DIR}
+)
+
+# 公共源文件
+set(COMMON_SRCS
+    ${SRC_DIR}/CryptoUtil.cc
+    ${SRC_DIR}/OSSManager.cc
+    ${SRC_DIR}/RabbitMQ.cc
+)
+
 # 公共链接库
 set(COMMON_LIBS
-    crypto
-    ssl
+    ${Protobuf_LIBRARIES}
+    ${OPENSSL_LIBRARIES}
     jwt
     workflow
     wfrest
     alibabacloud-oss-cpp-sdk
     curl
     pthread
-    protobuf
     srpc
     snappy
     lz4
@@ -57,29 +72,37 @@ set(COMMON_LIBS
 
 # ========== 主服务 ==========
 add_executable(server
-    CloudiskServer.cpp
-    main.cpp
+    ${SRC_DIR}/CloudiskServer.cpp
+    ${SRC_DIR}/main.cpp
     ${COMMON_SRCS}
-    ${PROTO_SRCS}
+    ${SRC_DIR}/cloud_disk_service.pb.cc
 )
 
+target_include_directories(server PRIVATE ${INCLUDE_DIR})
 target_link_libraries(server PRIVATE ${COMMON_LIBS})
 
 # ========== SRPC 服务端 ==========
 add_executable(rpc_server
-    server.pb_skeleton.cc
+    ${SRC_DIR}/server.pb_skeleton.cc
     ${COMMON_SRCS}
-    cloud_disk_service.pb.cc
+    ${SRC_DIR}/cloud_disk_service.pb.cc
 )
 
+target_include_directories(rpc_server PRIVATE ${INCLUDE_DIR})
 target_link_libraries(rpc_server PRIVATE ${COMMON_LIBS})
 
 # ========== SRPC 客户端（带 CloudiskServer） ==========
 add_executable(rpc_client
-    main.cpp
-    CloudiskServer.cpp   # 关键点：加入 CloudiskServer.cpp
+    ${SRC_DIR}/main.cpp
+    ${SRC_DIR}/CloudiskServer.cpp
     ${COMMON_SRCS}
-    cloud_disk_service.pb.cc
+    ${SRC_DIR}/cloud_disk_service.pb.cc
 )
 
+target_include_directories(rpc_client PRIVATE ${INCLUDE_DIR})
 target_link_libraries(rpc_client PRIVATE ${COMMON_LIBS})
+
+# 安装目标到bin目录
+install(TARGETS server rpc_server rpc_client
+    RUNTIME DESTINATION ${PROJECT_SOURCE_DIR}/bin
+)
