@@ -44,6 +44,12 @@ struct TableStruct_cloud_5fdisk_5fservice_2eproto {
   static const uint32_t offsets[];
 };
 extern const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_cloud_5fdisk_5fservice_2eproto;
+class signin_request;
+struct signin_requestDefaultTypeInternal;
+extern signin_requestDefaultTypeInternal _signin_request_default_instance_;
+class signin_response;
+struct signin_responseDefaultTypeInternal;
+extern signin_responseDefaultTypeInternal _signin_response_default_instance_;
 class signup_request;
 struct signup_requestDefaultTypeInternal;
 extern signup_requestDefaultTypeInternal _signup_request_default_instance_;
@@ -51,6 +57,8 @@ class signup_response;
 struct signup_responseDefaultTypeInternal;
 extern signup_responseDefaultTypeInternal _signup_response_default_instance_;
 PROTOBUF_NAMESPACE_OPEN
+template<> ::signin_request* Arena::CreateMaybeMessage<::signin_request>(Arena*);
+template<> ::signin_response* Arena::CreateMaybeMessage<::signin_response>(Arena*);
 template<> ::signup_request* Arena::CreateMaybeMessage<::signup_request>(Arena*);
 template<> ::signup_response* Arena::CreateMaybeMessage<::signup_response>(Arena*);
 PROTOBUF_NAMESPACE_CLOSE
@@ -378,6 +386,361 @@ class signup_response final :
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_cloud_5fdisk_5fservice_2eproto;
 };
+// -------------------------------------------------------------------
+
+class signin_request final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:signin_request) */ {
+ public:
+  inline signin_request() : signin_request(nullptr) {}
+  ~signin_request() override;
+  explicit PROTOBUF_CONSTEXPR signin_request(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+
+  signin_request(const signin_request& from);
+  signin_request(signin_request&& from) noexcept
+    : signin_request() {
+    *this = ::std::move(from);
+  }
+
+  inline signin_request& operator=(const signin_request& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline signin_request& operator=(signin_request&& from) noexcept {
+    if (this == &from) return *this;
+    if (GetOwningArena() == from.GetOwningArena()
+  #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
+        && GetOwningArena() != nullptr
+  #endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
+    ) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const signin_request& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const signin_request* internal_default_instance() {
+    return reinterpret_cast<const signin_request*>(
+               &_signin_request_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    2;
+
+  friend void swap(signin_request& a, signin_request& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(signin_request* other) {
+    if (other == this) return;
+  #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() != nullptr &&
+        GetOwningArena() == other->GetOwningArena()) {
+   #else  // PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() == other->GetOwningArena()) {
+  #endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(signin_request* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  signin_request* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
+    return CreateMaybeMessage<signin_request>(arena);
+  }
+  using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
+  void CopyFrom(const signin_request& from);
+  using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
+  void MergeFrom(const signin_request& from);
+  private:
+  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message* to, const ::PROTOBUF_NAMESPACE_ID::Message& from);
+  public:
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  uint8_t* _InternalSerialize(
+      uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(signin_request* other);
+
+  private:
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "signin_request";
+  }
+  protected:
+  explicit signin_request(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                       bool is_message_owned = false);
+  public:
+
+  static const ClassData _class_data_;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kUsernameFieldNumber = 1,
+    kPasswordFieldNumber = 2,
+  };
+  // string username = 1;
+  void clear_username();
+  const std::string& username() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_username(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_username();
+  PROTOBUF_NODISCARD std::string* release_username();
+  void set_allocated_username(std::string* username);
+  private:
+  const std::string& _internal_username() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_username(const std::string& value);
+  std::string* _internal_mutable_username();
+  public:
+
+  // string password = 2;
+  void clear_password();
+  const std::string& password() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_password(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_password();
+  PROTOBUF_NODISCARD std::string* release_password();
+  void set_allocated_password(std::string* password);
+  private:
+  const std::string& _internal_password() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_password(const std::string& value);
+  std::string* _internal_mutable_password();
+  public:
+
+  // @@protoc_insertion_point(class_scope:signin_request)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr username_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr password_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_cloud_5fdisk_5fservice_2eproto;
+};
+// -------------------------------------------------------------------
+
+class signin_response final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:signin_response) */ {
+ public:
+  inline signin_response() : signin_response(nullptr) {}
+  ~signin_response() override;
+  explicit PROTOBUF_CONSTEXPR signin_response(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+
+  signin_response(const signin_response& from);
+  signin_response(signin_response&& from) noexcept
+    : signin_response() {
+    *this = ::std::move(from);
+  }
+
+  inline signin_response& operator=(const signin_response& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline signin_response& operator=(signin_response&& from) noexcept {
+    if (this == &from) return *this;
+    if (GetOwningArena() == from.GetOwningArena()
+  #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
+        && GetOwningArena() != nullptr
+  #endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
+    ) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const signin_response& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const signin_response* internal_default_instance() {
+    return reinterpret_cast<const signin_response*>(
+               &_signin_response_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    3;
+
+  friend void swap(signin_response& a, signin_response& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(signin_response* other) {
+    if (other == this) return;
+  #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() != nullptr &&
+        GetOwningArena() == other->GetOwningArena()) {
+   #else  // PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() == other->GetOwningArena()) {
+  #endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(signin_response* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  signin_response* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
+    return CreateMaybeMessage<signin_response>(arena);
+  }
+  using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
+  void CopyFrom(const signin_response& from);
+  using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
+  void MergeFrom(const signin_response& from);
+  private:
+  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message* to, const ::PROTOBUF_NAMESPACE_ID::Message& from);
+  public:
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  uint8_t* _InternalSerialize(
+      uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(signin_response* other);
+
+  private:
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "signin_response";
+  }
+  protected:
+  explicit signin_response(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                       bool is_message_owned = false);
+  public:
+
+  static const ClassData _class_data_;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kUsernameFieldNumber = 2,
+    kTokenFieldNumber = 3,
+    kLocationFieldNumber = 4,
+    kStateCodeFieldNumber = 1,
+  };
+  // string username = 2;
+  void clear_username();
+  const std::string& username() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_username(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_username();
+  PROTOBUF_NODISCARD std::string* release_username();
+  void set_allocated_username(std::string* username);
+  private:
+  const std::string& _internal_username() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_username(const std::string& value);
+  std::string* _internal_mutable_username();
+  public:
+
+  // string token = 3;
+  void clear_token();
+  const std::string& token() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_token(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_token();
+  PROTOBUF_NODISCARD std::string* release_token();
+  void set_allocated_token(std::string* token);
+  private:
+  const std::string& _internal_token() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_token(const std::string& value);
+  std::string* _internal_mutable_token();
+  public:
+
+  // string location = 4;
+  void clear_location();
+  const std::string& location() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_location(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_location();
+  PROTOBUF_NODISCARD std::string* release_location();
+  void set_allocated_location(std::string* location);
+  private:
+  const std::string& _internal_location() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_location(const std::string& value);
+  std::string* _internal_mutable_location();
+  public:
+
+  // int32 state_code = 1;
+  void clear_state_code();
+  int32_t state_code() const;
+  void set_state_code(int32_t value);
+  private:
+  int32_t _internal_state_code() const;
+  void _internal_set_state_code(int32_t value);
+  public:
+
+  // @@protoc_insertion_point(class_scope:signin_response)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr username_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr token_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr location_;
+  int32_t state_code_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_cloud_5fdisk_5fservice_2eproto;
+};
 // ===================================================================
 
 
@@ -563,9 +926,291 @@ inline void signup_response::set_allocated_message(std::string* message) {
   // @@protoc_insertion_point(field_set_allocated:signup_response.message)
 }
 
+// -------------------------------------------------------------------
+
+// signin_request
+
+// string username = 1;
+inline void signin_request::clear_username() {
+  username_.ClearToEmpty();
+}
+inline const std::string& signin_request::username() const {
+  // @@protoc_insertion_point(field_get:signin_request.username)
+  return _internal_username();
+}
+template <typename ArgT0, typename... ArgT>
+inline PROTOBUF_ALWAYS_INLINE
+void signin_request::set_username(ArgT0&& arg0, ArgT... args) {
+ 
+ username_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:signin_request.username)
+}
+inline std::string* signin_request::mutable_username() {
+  std::string* _s = _internal_mutable_username();
+  // @@protoc_insertion_point(field_mutable:signin_request.username)
+  return _s;
+}
+inline const std::string& signin_request::_internal_username() const {
+  return username_.Get();
+}
+inline void signin_request::_internal_set_username(const std::string& value) {
+  
+  username_.Set(value, GetArenaForAllocation());
+}
+inline std::string* signin_request::_internal_mutable_username() {
+  
+  return username_.Mutable(GetArenaForAllocation());
+}
+inline std::string* signin_request::release_username() {
+  // @@protoc_insertion_point(field_release:signin_request.username)
+  return username_.Release();
+}
+inline void signin_request::set_allocated_username(std::string* username) {
+  if (username != nullptr) {
+    
+  } else {
+    
+  }
+  username_.SetAllocated(username, GetArenaForAllocation());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (username_.IsDefault()) {
+    username_.Set("", GetArenaForAllocation());
+  }
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  // @@protoc_insertion_point(field_set_allocated:signin_request.username)
+}
+
+// string password = 2;
+inline void signin_request::clear_password() {
+  password_.ClearToEmpty();
+}
+inline const std::string& signin_request::password() const {
+  // @@protoc_insertion_point(field_get:signin_request.password)
+  return _internal_password();
+}
+template <typename ArgT0, typename... ArgT>
+inline PROTOBUF_ALWAYS_INLINE
+void signin_request::set_password(ArgT0&& arg0, ArgT... args) {
+ 
+ password_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:signin_request.password)
+}
+inline std::string* signin_request::mutable_password() {
+  std::string* _s = _internal_mutable_password();
+  // @@protoc_insertion_point(field_mutable:signin_request.password)
+  return _s;
+}
+inline const std::string& signin_request::_internal_password() const {
+  return password_.Get();
+}
+inline void signin_request::_internal_set_password(const std::string& value) {
+  
+  password_.Set(value, GetArenaForAllocation());
+}
+inline std::string* signin_request::_internal_mutable_password() {
+  
+  return password_.Mutable(GetArenaForAllocation());
+}
+inline std::string* signin_request::release_password() {
+  // @@protoc_insertion_point(field_release:signin_request.password)
+  return password_.Release();
+}
+inline void signin_request::set_allocated_password(std::string* password) {
+  if (password != nullptr) {
+    
+  } else {
+    
+  }
+  password_.SetAllocated(password, GetArenaForAllocation());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (password_.IsDefault()) {
+    password_.Set("", GetArenaForAllocation());
+  }
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  // @@protoc_insertion_point(field_set_allocated:signin_request.password)
+}
+
+// -------------------------------------------------------------------
+
+// signin_response
+
+// int32 state_code = 1;
+inline void signin_response::clear_state_code() {
+  state_code_ = 0;
+}
+inline int32_t signin_response::_internal_state_code() const {
+  return state_code_;
+}
+inline int32_t signin_response::state_code() const {
+  // @@protoc_insertion_point(field_get:signin_response.state_code)
+  return _internal_state_code();
+}
+inline void signin_response::_internal_set_state_code(int32_t value) {
+  
+  state_code_ = value;
+}
+inline void signin_response::set_state_code(int32_t value) {
+  _internal_set_state_code(value);
+  // @@protoc_insertion_point(field_set:signin_response.state_code)
+}
+
+// string username = 2;
+inline void signin_response::clear_username() {
+  username_.ClearToEmpty();
+}
+inline const std::string& signin_response::username() const {
+  // @@protoc_insertion_point(field_get:signin_response.username)
+  return _internal_username();
+}
+template <typename ArgT0, typename... ArgT>
+inline PROTOBUF_ALWAYS_INLINE
+void signin_response::set_username(ArgT0&& arg0, ArgT... args) {
+ 
+ username_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:signin_response.username)
+}
+inline std::string* signin_response::mutable_username() {
+  std::string* _s = _internal_mutable_username();
+  // @@protoc_insertion_point(field_mutable:signin_response.username)
+  return _s;
+}
+inline const std::string& signin_response::_internal_username() const {
+  return username_.Get();
+}
+inline void signin_response::_internal_set_username(const std::string& value) {
+  
+  username_.Set(value, GetArenaForAllocation());
+}
+inline std::string* signin_response::_internal_mutable_username() {
+  
+  return username_.Mutable(GetArenaForAllocation());
+}
+inline std::string* signin_response::release_username() {
+  // @@protoc_insertion_point(field_release:signin_response.username)
+  return username_.Release();
+}
+inline void signin_response::set_allocated_username(std::string* username) {
+  if (username != nullptr) {
+    
+  } else {
+    
+  }
+  username_.SetAllocated(username, GetArenaForAllocation());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (username_.IsDefault()) {
+    username_.Set("", GetArenaForAllocation());
+  }
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  // @@protoc_insertion_point(field_set_allocated:signin_response.username)
+}
+
+// string token = 3;
+inline void signin_response::clear_token() {
+  token_.ClearToEmpty();
+}
+inline const std::string& signin_response::token() const {
+  // @@protoc_insertion_point(field_get:signin_response.token)
+  return _internal_token();
+}
+template <typename ArgT0, typename... ArgT>
+inline PROTOBUF_ALWAYS_INLINE
+void signin_response::set_token(ArgT0&& arg0, ArgT... args) {
+ 
+ token_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:signin_response.token)
+}
+inline std::string* signin_response::mutable_token() {
+  std::string* _s = _internal_mutable_token();
+  // @@protoc_insertion_point(field_mutable:signin_response.token)
+  return _s;
+}
+inline const std::string& signin_response::_internal_token() const {
+  return token_.Get();
+}
+inline void signin_response::_internal_set_token(const std::string& value) {
+  
+  token_.Set(value, GetArenaForAllocation());
+}
+inline std::string* signin_response::_internal_mutable_token() {
+  
+  return token_.Mutable(GetArenaForAllocation());
+}
+inline std::string* signin_response::release_token() {
+  // @@protoc_insertion_point(field_release:signin_response.token)
+  return token_.Release();
+}
+inline void signin_response::set_allocated_token(std::string* token) {
+  if (token != nullptr) {
+    
+  } else {
+    
+  }
+  token_.SetAllocated(token, GetArenaForAllocation());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (token_.IsDefault()) {
+    token_.Set("", GetArenaForAllocation());
+  }
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  // @@protoc_insertion_point(field_set_allocated:signin_response.token)
+}
+
+// string location = 4;
+inline void signin_response::clear_location() {
+  location_.ClearToEmpty();
+}
+inline const std::string& signin_response::location() const {
+  // @@protoc_insertion_point(field_get:signin_response.location)
+  return _internal_location();
+}
+template <typename ArgT0, typename... ArgT>
+inline PROTOBUF_ALWAYS_INLINE
+void signin_response::set_location(ArgT0&& arg0, ArgT... args) {
+ 
+ location_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:signin_response.location)
+}
+inline std::string* signin_response::mutable_location() {
+  std::string* _s = _internal_mutable_location();
+  // @@protoc_insertion_point(field_mutable:signin_response.location)
+  return _s;
+}
+inline const std::string& signin_response::_internal_location() const {
+  return location_.Get();
+}
+inline void signin_response::_internal_set_location(const std::string& value) {
+  
+  location_.Set(value, GetArenaForAllocation());
+}
+inline std::string* signin_response::_internal_mutable_location() {
+  
+  return location_.Mutable(GetArenaForAllocation());
+}
+inline std::string* signin_response::release_location() {
+  // @@protoc_insertion_point(field_release:signin_response.location)
+  return location_.Release();
+}
+inline void signin_response::set_allocated_location(std::string* location) {
+  if (location != nullptr) {
+    
+  } else {
+    
+  }
+  location_.SetAllocated(location, GetArenaForAllocation());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (location_.IsDefault()) {
+    location_.Set("", GetArenaForAllocation());
+  }
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  // @@protoc_insertion_point(field_set_allocated:signin_response.location)
+}
+
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 

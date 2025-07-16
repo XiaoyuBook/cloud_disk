@@ -2,10 +2,20 @@
 #include "CloudiskServer.h"
 #include "handler.h"
 #include "RabbitMQ.h"
+#include <openssl/asn1.h>
+#include <workflow/WFFacilities.h>
 
 using namespace wfrest;
 using std::string;
 
+
+
+// rpc客户端创建
+std::unique_ptr<cloud_disk_service::SRPCClient> get_srpc_client() {
+    const char* ip = "127.0.0.1";
+    unsigned short port = 1412;
+    return std::make_unique<cloud_disk_service::SRPCClient>(ip, port);
+}
 
 void CloudiskServer::register_modules() {
     // 1.设置静态资源的路由
@@ -112,12 +122,11 @@ void CloudiskServer::register_callback(const HttpReq* req, HttpResp *resp, Serie
         resp->String("Missing username or password");
         return;
     }
+
+    // 微服务部分
     using namespace srpc;
     GOOGLE_PROTOBUF_VERIFY_VERSION;
-	const char *ip = "127.0.0.1";
-	unsigned short port = 1412;
-
-	cloud_disk_service::SRPCClient client(ip, port);
+	cloud_disk_service::SRPCClient client(RPC_IP, RPC_PORT);
 
 	signup_request signup_req;
     signup_req.set_username(username_it->second);
@@ -148,59 +157,40 @@ void CloudiskServer::login_callback(const HttpReq* req, HttpResp *resp,SeriesWor
         return;
     }
 
-
     string username = username_it->second;
     string password = password_it->second;
-    auto ctx = new Context{username, password, resp};   
 
+    // 微服务部分
+    using namespace srpc;
+    GOOGLE_PROTOBUF_VERIFY_VERSION;
+	cloud_disk_service::SRPCClient client(RPC_IP, RPC_PORT);
 
-    string sql = "SELECT * FROM tbl_user WHERE username='" + username + "'";
-    cout << "[SQL] " << sql << "\n";
-    WFMySQLTask* sql_task = WFTaskFactory::create_mysql_task(MYSQL_URL, MAX_RETRY,
-        [ctx](WFMySQLTask *sql_task){
-            auto resp = ctx->resp;
-            if(sql_task->get_state() != WFT_STATE_SUCCESS) {
-                resp->set_status(500);
-                resp->String("Database error");
-                delete ctx;
-                return;
-            }
-            MySQLResultCursor cursor{sql_task->get_resp()};
-            std::vector<MySQLCell> record;
-            bool success = cursor.fetch_row(record);
-            if (!success) {
-                resp->set_status(401);
-                resp->String("Invalid username or password");
-                delete ctx;
-                return;
-            }
-            
-            
-            string db_hashcode = record[2].as_string(); 
-            string db_salt = record[3].as_string();
-            string temp = ctx->password;     
-            string gen_hashcode = CryptoUtil::hash_password(temp, db_salt);
-            if (gen_hashcode == db_hashcode) {
-                resp->set_status(200);
-                string token = CryptoUtil::generate_token(ctx->username);
-                json ret = {
-                    {"data", {
-                        {"Username", ctx->username},  
-                        {"Token", token},           
-                        {"Location", "/static/view/home.html"}
-                    }}
-                };
-                resp->String(ret.dump(2));
+	signin_request signin_req;
+    signin_req.set_username(username);
+    signin_req.set_password(password);
+    WFFacilities::WaitGroup wait_http {1};
+    client.signin(&signin_req,[resp,&wait_http](signin_response *response, RPCContext *ctx){
+        if(ctx->success()){
+            int code = response->state_code();
+            string Username = response->username();
+            string Token = response->token();
+            string Location = response->location();
 
-            } else {
-                resp->set_status(401);
-                resp->String("Invalid username or password");
-            }
-            delete ctx;
-        }
-    );
-    sql_task->get_req()->set_query(sql);
-    series->push_back(sql_task);
+            json ret = {
+                {"data", {
+                    {"Username", Username},  
+                    {"Token", Token},           
+                    {"Location", Location}
+                }}
+            };
+            resp->String(ret.dump(2));
+        } else {
+            resp->set_status(response->state_code());
+            resp->String("Invalid username or password");
+        }   
+        wait_http.done();     
+    });
+    wait_http.wait();
 
 }
 
@@ -255,8 +245,6 @@ void CloudiskServer::search_file_callback(const HttpReq* req, HttpResp *resp,Ser
         resp->append_output_body_nocopy("<html>401 Unauthorized</html>");
         return ;
     }
-    cout << "token is currect" << endl;
-
     // 先获取id，通过id查询uid
     string sql = "SELECT * FROM tbl_user WHERE username = '" + username +"'";
     WFMySQLTask *sql_task = WFTaskFactory::create_mysql_task(MYSQL_URL,MAX_RETRY,[resp,series](WFMySQLTask *sql_task){
