@@ -2,8 +2,10 @@
 #include "../include/CloudiskServer.h"
 #include "../include/handler.h"
 #include "../include/RabbitMQ.h"
+#include <cstdio>
 #include <openssl/asn1.h>
 #include <workflow/WFFacilities.h>
+
 
 using namespace wfrest;
 using std::string;
@@ -140,7 +142,7 @@ void CloudiskServer::register_callback(const HttpReq* req, HttpResp *resp, Serie
             resp->String(str);
         }
         wait_http.done();
-    });
+    }); // 同步阻塞，与workflow
     wait_http.wait();
 
    }
@@ -361,7 +363,13 @@ void CloudiskServer::upload_callback(const HttpReq *req, HttpResp* resp, SeriesW
                 if (stat(dir_path.c_str(), &st) != 0) {
                     mkdir(dir_path.c_str(), 0755);
                 }
-                resp->Save(save_path, content);
+
+                // 异步保存
+                // resp->Save(save_path, content); 
+                // 同步保存
+                FILE *fp = fopen(save_path.c_str(),"w");
+                fputs(content.c_str(), fp);
+                fclose(fp);
 
                 // v3的上传
                 string msg ="disk/"+username +"/"+filename;
