@@ -42,7 +42,7 @@
 > ```docker
 > docker run -d --hostname rabbitsrv --name rabbit -p 5672:5672 -p 15672:15672 -p 25672:25672 -v /data/rabbitmq:/var/lib/rabbitmq rabbitmq:management
 > ```
-
+> 消息队列后端 为 ip:15672查看
 ## v4：rpc通信
 > 使用rpc通信将用户的登录注册分离出来
 > 生成文件相应语句，其中example.proto根据需求进行修改
@@ -50,6 +50,24 @@
 >  protoc --cpp_out=./ example.proto
 >  srpc_generator protobuf example.proto ./
 > ```
+## v5:注册中心
+> ```shell
+# 启动第一个节点
+> docker run --name consul1 -d -p 8500:8500 -p 8301:8301 -p 8302:8302 -p 8600:8600 hashicorp/consul agent -server -bootstrap-expect 2 -ui -bind=0.0.0.0 -client=0.0.0.0
+> 
+> # 查看第一个节点的IP地址, 本例子中是：172.17.0.3
+> docker inspect consul1
+> 
+> # 加入第二个节点，注意：-join 后面的 ip 地址应与上面查询的结果一致
+> docker run --name consul2 -d -p 8501:8500 hashicorp/consul agent -server -ui -bind=0.0.0.0 -client=0.0.0.0 -join 172.17.0.3
+> 
+> # 加入第三个节点，注意：-join 后面的 ip 地址应与上面查询的结果一致
+> docker run --name consul3 -d -p 8502:8500 hashicorp/consul agent -server -ui -bind=0.0.0.0 -client=0.0.0.0 -join 172.17.0.3
+> ```
+> 还需要安装ppconsul
+>  在rpc_server逻辑那里增加一个发送心跳，然后rpc_client那里检测心跳获取ip和port即可
+> 获取ip和port的地址：http://<consul_host>:8500/v1/health/service/<service_name>?passing=true
+> 其中cosult_host和service_name根据自己情况修改
 ## 启动方法
 -  v1:  g++  main.cc CryptoUtil.cc -o server -lworkflow -lwfrest -lssl -lcrypto -ljwt
  // 依次运行即可
@@ -72,7 +90,8 @@
     > ./rpc_client
     > ./rpc_server
     > ```
--  v5:
+-  v5:同v4
+    
 ## config文件需要自己创建，按照自己的需求进行创建
 ###  OSS_config.json
 > ```json
