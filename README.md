@@ -64,7 +64,6 @@
 -  v3:同v2
 -  v4: v4需要创建一个bin文件夹，并且把static文件夹放在bin文件夹下面，然后去bin文件夹下面运行./rpc_server 和./rpc_client
     > ```shell
-    >     > ```shell
     > mkdir build 
     > cd build 
     > cmake .. 
