@@ -16,6 +16,9 @@ OSSManager::~OSSManager() {
 }
 
 void OSSManager::get_OSSManager_config(const char* config_path) {
+    using std::cout;
+    using std::endl;
+    cout << "config_path:" << config_path<<endl;
     std::ifstream ifs(config_path);
     if(!ifs.is_open()) {
         std::cout << "无法打开配置文件" << std::endl;
@@ -25,7 +28,11 @@ void OSSManager::get_OSSManager_config(const char* config_path) {
     m_endpoint = config["endpoint"];
     m_accessKeyId = config["accessKeyId"];
     m_accessKeySecret = config["accessKeySecret"];
+    cout << "endpoint:  " << m_endpoint<< endl;
+    cout << "accessKeyId:  " <<m_accessKeyId<<endl;
+    cout << "accessKeySecret:  " << m_accessKeySecret<<endl;
 }
+
 bool OSSManager::upload_file(const std::string& bucketName,
                              const std::string& objectName,
                              const std::string& localFilePath) {

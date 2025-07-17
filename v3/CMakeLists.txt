@@ -17,7 +17,7 @@ add_executable(server
     main.cpp
     CryptoUtil.cc
     OSSManager.cc
-    RabbitMQ.cc      # 添加RabbitMQ相关源文件
+    RabbitMQ.cc      
 )
 
 # 查找SimpleAmqpClient库

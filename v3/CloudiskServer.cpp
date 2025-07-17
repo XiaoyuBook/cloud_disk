@@ -382,7 +382,8 @@ void CloudiskServer::upload_callback(const HttpReq *req, HttpResp* resp, SeriesW
 
                 // v3的上传
                 RabbitMQ r("RabbitMQ_config.json");
-                r.producer(save_path.c_str());
+                string msg = "disk/"+username +"/" + filename;
+                r.producer(msg.c_str());
 
                 std::string sql_insert = "INSERT INTO tbl_file(uid, filename, hashcode, size) VALUES (" +
                                          std::to_string(uid) + ", '" +

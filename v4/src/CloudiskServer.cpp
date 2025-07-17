@@ -131,19 +131,60 @@ void CloudiskServer::register_callback(const HttpReq* req, HttpResp *resp, Serie
 	cloud_disk_service::SRPCClient client(RPC_IP, RPC_PORT);
 
 	signup_request signup_req;
+    cout << "username_it :" << username_it->second<<endl;
+
     signup_req.set_username(username_it->second);
+    cout << "signup_req.username(): " << signup_req.username() << endl;
     signup_req.set_password(password_it->second);
-    WFFacilities::WaitGroup wait_http { 1 };
-	client.signup(&signup_req, [resp,&wait_http](signup_response *response, RPCContext *ctx){
-        if(ctx->success()) {
+    // 使用workflow异步操作如下
+    auto *rpc_task = client.create_signup_task([resp](signup_response *response, RPCContext *ctx) {
+        if (ctx->success()) {
             int code = response->state_code();
-            string str = response->message();
+            std::string str = response->message();
             resp->set_status(code);
             resp->String(str);
         }
-        wait_http.done();
-    }); // 同步阻塞，与workflow
-    wait_http.wait();
+    });
+    rpc_task->serialize_input(&signup_req); // 重要，否则传进去为空
+    series->push_back(rpc_task);
+
+
+
+    // 相对较好的同步操作如下
+    // signup_response response;  // 创建对象
+    // RPCSyncContext ctx;
+	// client.signup(&signup_req, &response, &ctx);
+
+    //     if(ctx.success) {
+    //         int code = response.state_code();
+    //         string str = response.message();
+    //         resp->set_status(code);
+    //         resp->String(str);
+    //     }
+    // 不好的同步操作如下
+    // WFFacilities::WaitGroup wait_http { 1 };
+    //     client.signin(&signin_req,[resp,&wait_http](signin_response *response, RPCContext *ctx){
+    //     if(ctx->success()){
+    //         int code = response->state_code();
+    //         string Username = response->username();
+    //         string Token = response->token();
+    //         string Location = response->location();
+
+    //         json ret = {
+    //             {"data", {
+    //                 {"Username", Username},  
+    //                 {"Token", Token},           
+    //                 {"Location", Location}
+    //             }}
+    //         };
+    //         resp->String(ret.dump(2));
+    //     } else {
+    //         resp->set_status(response->state_code());
+    //         resp->String("Invalid username or password");
+    //     }   
+    //     wait_http.done();     
+    // });
+    // wait_http.wait();
 
    }
 
@@ -166,34 +207,58 @@ void CloudiskServer::login_callback(const HttpReq* req, HttpResp *resp,SeriesWor
     using namespace srpc;
     GOOGLE_PROTOBUF_VERIFY_VERSION;
 	cloud_disk_service::SRPCClient client(RPC_IP, RPC_PORT);
-
 	signin_request signin_req;
     signin_req.set_username(username);
     signin_req.set_password(password);
-    WFFacilities::WaitGroup wait_http {1};
-    client.signin(&signin_req,[resp,&wait_http](signin_response *response, RPCContext *ctx){
-        if(ctx->success()){
-            int code = response->state_code();
-            string Username = response->username();
-            string Token = response->token();
-            string Location = response->location();
 
+
+    auto *rpc_task = client.create_signin_task([resp](signin_response *response, RPCContext *ctx) {
+        if (ctx->success()) {
+            int code = response->state_code();
+            std::string Username = response->username();
+            std::string Token = response->token();
+            std::string Location = response->location();
+    
             json ret = {
                 {"data", {
-                    {"Username", Username},  
-                    {"Token", Token},           
+                    {"Username", Username},
+                    {"Token", Token},
                     {"Location", Location}
                 }}
             };
+            resp->set_status(code);  // 可选：将状态码写入 HTTP 响应头
             resp->String(ret.dump(2));
         } else {
             resp->set_status(response->state_code());
             resp->String("Invalid username or password");
-        }   
-        wait_http.done();     
+        }
     });
-    wait_http.wait();
+    
+    rpc_task->serialize_input(&signin_req); 
+    series->push_back(rpc_task);            
+    // 同步形式
+    // signin_response response;  
+    // RPCSyncContext ctx;
+    // client.signin(&signin_req,&response, &ctx);
+    //     if(ctx.success){
+    //         int code = response.state_code();
+    //         string Username = response.username();
+    //         string Token = response.token();
+    //         string Location = response.location();
 
+    //         json ret = {
+    //             {"data", {
+    //                 {"Username", Username},  
+    //                 {"Token", Token},           
+    //                 {"Location", Location}
+    //             }}
+    //         };
+    //         resp->String(ret.dump(2));
+    //     } else {
+    //         resp->set_status(response.state_code());
+    //         resp->String("Invalid username or password");
+    //     }     
+    
 }
 
 // 获取用户信息
@@ -204,9 +269,9 @@ void CloudiskServer::getinfo_callback(const HttpReq *req, HttpResp *resp, Series
         resp->set_status_code("401"); 
         resp->append_output_body_nocopy("<html>401 Unauthorized</html>");
         return ;
+
     } 
     string sql = "SELECT * FROM tbl_user WHERE username = '" + username +"'";
-    cout << "[SQL]" << sql << endl;
     WFMySQLTask *sql_task = WFTaskFactory::create_mysql_task(MYSQL_URL,MAX_RETRY,[resp](WFMySQLTask *sql_task){
         if(sql_task->get_state() != WFT_STATE_SUCCESS ) {
             resp->set_status(500);

@@ -47,7 +47,9 @@ void RabbitMQ::consumer() {
             OSSManager oss("OSS_config.json");
             string bucketName = "oss-learing";
             string objectName = save_path;
+            std::cout << "save path :" <<save_path<<std::endl; 
             string filePath = "./"+save_path;
+            std::cout << "filePath :" <<filePath<<std::endl; 
             bool ok = oss.upload_file(bucketName, objectName, filePath);
             if(!ok) {
                 std::cout << "failed to upload oss" << std::endl;
@@ -55,5 +57,3 @@ void RabbitMQ::consumer() {
         }
     }
 }
-
-

@@ -43,7 +43,6 @@ void RabbitMQ::consumer() {
     while(1) {
         AmqpClient::Envelope::ptr_t envelope = channel->BasicConsumeMessage();
         if(envelope && envelope->Message()) {
-            sleep(1);
             string objectName = envelope->Message()->Body();
             OSSManager oss(OSS_CONFIG_PATH);
             string bucketName = "oss-learing";

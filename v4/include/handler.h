@@ -18,6 +18,8 @@
 #include "CryptoUtil.h"
 #include "nlohmann/json.hpp"
 #include <alibabacloud/oss/OssClient.h>
+#include <stdlib.h>
+#include <stdio.h>
 
 #include "OSSManager.h"
 #include "cloud_disk_service.srpc.h"
