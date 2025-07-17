@@ -35,6 +35,7 @@
 ## v2：云服务
 > 实现云服务，用阿里云oss备份文件
 > 下载安装 [OSS C++ SDK](https://help.aliyun.com/zh/oss/developer-reference/cpp/?spm=a2c4g.11186623.0.i1)
+> 需要去阿里云开通oss服务，然后创建accessKey，用这个进行访问
 
 ## v3：消息队列
 > 使用RabbitMQ消息队列对oss上传文件进行处理
@@ -51,17 +52,20 @@
 >  srpc_generator protobuf example.proto ./
 > ```
 ## v5:注册中心
+>  启动第一个节点
 > ```shell
-# 启动第一个节点
 > docker run --name consul1 -d -p 8500:8500 -p 8301:8301 -p 8302:8302 -p 8600:8600 hashicorp/consul agent -server -bootstrap-expect 2 -ui -bind=0.0.0.0 -client=0.0.0.0
-> 
-> # 查看第一个节点的IP地址, 本例子中是：172.17.0.3
-> docker inspect consul1
-> 
-> # 加入第二个节点，注意：-join 后面的 ip 地址应与上面查询的结果一致
+> ```
+>  查看第一个节点的IP地址, 本例子中是：172.17.0.3
+>  ```shell
+>  docker inspect consul1
+>  ```
+>  加入第二个节点，注意：-join 后面的 ip 地址应与上面查询的结果一致
+> ```shell
 > docker run --name consul2 -d -p 8501:8500 hashicorp/consul agent -server -ui -bind=0.0.0.0 -client=0.0.0.0 -join 172.17.0.3
-> 
-> # 加入第三个节点，注意：-join 后面的 ip 地址应与上面查询的结果一致
+> ```
+>  加入第三个节点，注意：-join 后面的 ip 地址应与上面查询的结果一致
+> ```shell
 > docker run --name consul3 -d -p 8502:8500 hashicorp/consul agent -server -ui -bind=0.0.0.0 -client=0.0.0.0 -join 172.17.0.3
 > ```
 > 还需要安装ppconsul
@@ -69,9 +73,9 @@
 > 获取ip和port的地址：http://<consul_host>:8500/v1/health/service/<service_name>?passing=true
 > 其中cosult_host和service_name根据自己情况修改
 ## 启动方法
--  v1:  g++  main.cc CryptoUtil.cc -o server -lworkflow -lwfrest -lssl -lcrypto -ljwt
+-  ### v1:  g++  main.cc CryptoUtil.cc -o server -lworkflow -lwfrest -lssl -lcrypto -ljwt
  // 依次运行即可
--  v2: 
+-  ### v2: 
     > ```shell
     > mkdir build 
     > cd build 
@@ -79,8 +83,8 @@
     > make 
     > cd ../.. && ./server 
     > ```
--  v3:同v2
--  v4: v4需要创建一个bin文件夹，并且把static文件夹放在bin文件夹下面，然后去bin文件夹下面运行./rpc_server 和./rpc_client
+-  ### v3:同v2
+-  ### v4: v4需要创建一个bin文件夹，并且把static文件夹放在bin文件夹下面，然后去bin文件夹下面运行./rpc_server 和./rpc_client
     > ```shell
     > mkdir build 
     > cd build 
@@ -90,7 +94,7 @@
     > ./rpc_client
     > ./rpc_server
     > ```
--  v5:同v4
+-  ### v5:同v4
     
 ## config文件需要自己创建，按照自己的需求进行创建
 ###  OSS_config.json
