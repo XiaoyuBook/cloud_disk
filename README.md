@@ -50,20 +50,42 @@
 >  protoc --cpp_out=./ example.proto
 >  srpc_generator protobuf example.proto ./
 > ```
+## 启动方法
 -  v1:  g++  main.cc CryptoUtil.cc -o server -lworkflow -lwfrest -lssl -lcrypto -ljwt
  // 依次运行即可
--  v2:  mkdir build && cd build && cmake .. && make && cd ../.. && ./server 
--  v4: v4需要创建一个bin文件夹，并且把static文件夹放在bin文件夹下面
+-  v2: 
+    > ```shell
+    > mkdir build 
+    > cd build 
+    > cmake .. 
+    > make 
+    > cd ../.. && ./server 
+    > ```
+-  v3:同v2
+-  v4: v4需要创建一个bin文件夹，并且把static文件夹放在bin文件夹下面，然后去bin文件夹下面运行./rpc_server 和./rpc_client
+    > ```shell
+    >     > ```shell
+    > mkdir build 
+    > cd build 
+    > cmake .. 
+    > make 
+    > cd ../bin
+    > ./rpc_client
+    > ./rpc_server
+    > ```
 -  v5:
 ## config文件需要自己创建，按照自己的需求进行创建
 ###  OSS_config.json
+> ```json
 > {
 >     "endpoint": "",
 >     "accessKeyId": "",
 >     "accessKeySecret":""
 > }
+> ```
 
 ### RabbitMQ_config.json
+> ```json
 > {
 >     "host":"",
 >     "port":,
@@ -75,4 +97,5 @@
 >     "uri":"",
 >     "queue":""
 > }
+> ```
 > // uri 参考： amqp://guest:guest@localhost:5672/%2f

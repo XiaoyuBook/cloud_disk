@@ -70,14 +70,6 @@ set(COMMON_LIBS
     ${Boost_LIBRARIES}
 )
 
-# ========== 主服务 ==========
-add_executable(server
-    ${SRC_DIR}/CloudiskServer.cpp
-    ${SRC_DIR}/main.cpp
-    ${COMMON_SRCS}
-    ${SRC_DIR}/cloud_disk_service.pb.cc
-)
-
 target_include_directories(server PRIVATE ${INCLUDE_DIR})
 target_link_libraries(server PRIVATE ${COMMON_LIBS})
 
@@ -91,7 +83,7 @@ add_executable(rpc_server
 target_include_directories(rpc_server PRIVATE ${INCLUDE_DIR})
 target_link_libraries(rpc_server PRIVATE ${COMMON_LIBS})
 
-# ========== SRPC 客户端（带 CloudiskServer） ==========
+# ========== SRPC 客户端 ==========
 add_executable(rpc_client
     ${SRC_DIR}/main.cpp
     ${SRC_DIR}/CloudiskServer.cpp
